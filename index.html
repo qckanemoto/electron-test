@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>renamer</title>
+</head>
+<body>
+<style>
+    * {
+        font-family: "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", sans-serif;
+        font-size: 12px;
+    }
+    #chooser, #sender {
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        padding: 5px;
+    }
+    .doing, .done {
+        display: none;
+    }
+</style>
+<input type="file" webkitdirectory directory id="chooser" />
+<button id="sender">実行</button>
+<p>フォルダを選択して「実行」をクリックすると、"rename"フォルダ配下にリネーム後のファイルが生成されます。</p>
+<p class="doing">実行中...</p>
+<p class="done">完了</p>
+<script>
+    var ipc = require('ipc');
+    var $ = require('jquery.1');
+
+    $(function () {
+        $('#chooser').focus();
+
+        $('#sender').on('click', function () {
+            $('.doing').show();
+            $('.done').hide();
+
+            setTimeout(function () {
+                var file = $('#chooser').get(0).files[0];
+                ipc.send('form-sent', file.path);
+            }, 100);
+        });
+
+        ipc.on('rename-finished', function (event, arg) {
+            $('.doing').hide();
+            $('.done').show();
+        });
+    });
+</script>
+</body>
+</html>
